@@ -168,6 +168,12 @@ function New-AzConnectedKubernetes {
         ${Tag},
 
         [Parameter()]
+        [Microsoft.Azure.PowerShell.Cmdlets.ConnectedKubernetes.Category('Path')]
+        [System.String]
+        # OID of 'custom-locations' app.
+        ${CustomLocationsOid},
+
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         # Accept EULA of ConnectedKubernetes, legal term will pop up without this parameter provided
         ${AcceptEULA},
@@ -267,6 +273,9 @@ function New-AzConnectedKubernetes {
         }
         if ($PSBoundParameters.ContainsKey('KubeContext')) {
             $Null = $PSBoundParameters.Remove('KubeContext')
+        }
+        if ($PSBoundParameters.ContainsKey('CustomLocationsOid')) {
+            $Null = $PSBoundParameters.Remove('CustomLocationsOid')
         }
         if (($null -eq $KubeContext) -or ($KubeContext -eq '')) {
             $KubeContext = kubectl config current-context
