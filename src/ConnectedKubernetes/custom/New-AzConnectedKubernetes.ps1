@@ -274,9 +274,6 @@ function New-AzConnectedKubernetes {
         if ($PSBoundParameters.ContainsKey('KubeContext')) {
             $Null = $PSBoundParameters.Remove('KubeContext')
         }
-        if ($PSBoundParameters.ContainsKey('CustomLocationsOid')) {
-            $Null = $PSBoundParameters.Remove('CustomLocationsOid')
-        }
         if (($null -eq $KubeContext) -or ($KubeContext -eq '')) {
             $KubeContext = kubectl config current-context
         }
@@ -290,6 +287,12 @@ function New-AzConnectedKubernetes {
         }
         if ($PSBoundParameters.ContainsKey('SubscriptionId')) {
             $CommonPSBoundParameters['SubscriptionId'] = $SubscriptionId
+        }
+        if ($PSBoundParameters.ContainsKey('PrivateLinkState') -and ($null -ne $CustomLocationsOid) -and ($CustomLocationsOid -ne '')) {
+            Write-Warning "The features 'cluster-connect' and 'custom-locations' cannot be enabled for a private link enabled connected cluster."
+        }
+        if ($PSBoundParameters.ContainsKey('CustomLocationsOid')) {
+            $Null = $PSBoundParameters.Remove('CustomLocationsOid')
         }
         $IdentityType = [Microsoft.Azure.PowerShell.Cmdlets.ConnectedKubernetes.Support.ResourceIdentityType]::SystemAssigned
         $PSBoundParameters.Add('IdentityType', $IdentityType)
@@ -485,6 +488,9 @@ function New-AzConnectedKubernetes {
         }
         if (-not ([string]::IsNullOrEmpty($KubeContext))) {
             $options += " --kube-context $KubeContext"
+        }
+        if (-not ([string]::IsNullOrEmpty($CustomLocationsOid))) {
+            $options += " --set systemDefaultValues.customLocations.oid=$CustomLocationsOid"
         }
         if (!$NoWait) {
             $options += " --wait --timeout $OnboardingTimeout"
